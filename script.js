@@ -44,9 +44,9 @@ const gameBoardModule = (function() {
             gameBoardSquares.push(squareState);
         }
         // event listeners
-        for (i=0; i< gameBoardSquares.length; i++) {
+     /*    for (i=0; i< gameBoardSquares.length; i++) {
             list[i].addEventListener("click", squareUpdate); 
-        }
+        } */
     
     }
     init();
@@ -55,9 +55,8 @@ const gameBoardModule = (function() {
    function squareUpdate() {
             let squareContent = this.textContent;
             if (squareContent=="") {
-                const player = gameFlow.whoseTurn();
-                this.textContent=player;
-                gameFlow.assessBoardState();
+                this.textContent = gameFlow.whoseTurn();
+                //gameFlow.assessBoardState();
     
             }
         }
@@ -70,7 +69,7 @@ const gameBoardModule = (function() {
       
     }
     
-        return {list, clearBoard, numberOfGameSquares};
+        return {list, clearBoard, numberOfGameSquares, squareUpdate};
     })();
 
 const gameFlow = (function() {
@@ -78,26 +77,34 @@ const gameFlow = (function() {
         let totalNumberOfGoes = gameBoardModule.numberOfGameSquares;
         let numberOfGoesCount = 1;
 
+        // set event listeners 
+            for (i=0; i< gameBoardModule.list.length; i++) {
+                console.log("List for listener " + gameBoardModule.list[i].textContent);
+                gameBoardModule.list[i].addEventListener("click", gameBoardModule.squareUpdate); 
+            } 
+        
+
         function whoseTurn() {
 
             if (numberOfGoesCount < totalNumberOfGoes) {
                 console.log("Number of goes " +numberOfGoesCount);
                 numberOfGoesCount++;
-                turn= _nextTurn(turn); 
+                turn= _setTurn(turn);
+                assessBoardState(); 
 
             }
             else if (numberOfGoesCount == totalNumberOfGoes) {
-               let winner = assessBoardState(); 
+               turn= _setTurn(turn);
+                let winner = assessBoardState(); 
                 console.log("Winner: " + winner);
                _playerWins("tie");
-               turn= _nextTurn(turn);
  
             }
             return turn;  
 
 
         }
-        function _nextTurn(turn) {
+        function _setTurn(turn) {
             
                 turn=="x" ? turn="o" : turn="x";
                 console.log("turn " + turn);
@@ -124,12 +131,12 @@ const gameFlow = (function() {
             
                 for (j=0; j<winningResult.length; j++) {
                     if (winningResult[j].every(elem => resultx.includes(elem))){
-                        _playerWins("x");
                         winnerPresent=true;
+                        _playerWins("x");
                     }
                     else if (winningResult[j].every(elem => resulto.includes(elem))){
-                        _playerWins("o");
                         winnerPresent=true;
+                        _playerWins("o");
                     }
                 }
                 return winnerPresent;
