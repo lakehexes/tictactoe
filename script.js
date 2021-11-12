@@ -1,16 +1,106 @@
+const gameBoardModule = (function() {
+ 
+    let list=[];
+    const numberOfGameSquares = 9;
+
+
+    function init() {
+        const gameBoard = document.getElementById('gameboard');
+        let squareState; 
+    
+
+        const numberOfRows = 3;
+        const row=[];
+        
+        const gameBoardSquares = [];
+
+        //create rows for squares to go in
+        for (i=0; i<numberOfRows; i++) {
+            let rowInit = document.createElement("div");
+            rowInit.id = i;
+            rowInit.classList.add("row");
+            row.push(rowInit);
+            gameboard.appendChild(rowInit);
+         }
+    
+
+        //create squares
+        for (i=0; i<numberOfGameSquares; i++) {
+            list[i] = document.createElement("div");
+            list[i].id=i;
+            list[i].classList.add("square");
+            squareState = "";
+            list[i].textContent = squareState;
+            if (i<3) {
+                row[0].appendChild(list[i]);
+            }
+            else if (i>=3 && i<6) {
+                row[1].appendChild(list[i]);
+            }
+            else if (i>=6) {
+                row[2].appendChild(list[i]);
+            }
+
+            gameBoardSquares.push(squareState);
+        }
+        // event listeners
+        for (i=0; i< gameBoardSquares.length; i++) {
+            list[i].addEventListener("click", squareUpdate); 
+        }
+    
+    }
+    init();
+
+    
+   function squareUpdate() {
+            let squareContent = this.textContent;
+            if (squareContent=="") {
+                const player = gameFlow.whoseTurn();
+                this.textContent=player;
+                gameFlow.assessBoardState();
+    
+            }
+        }
+
+    function clearBoard () {
+        for (i=0; i<list.length; i++) {
+        list[i].textContent = "";
+        console.log("List i " + list[i].textContent);
+        }
+      
+    }
+    
+        return {list, clearBoard, numberOfGameSquares};
+    })();
 
 const gameFlow = (function() {
         let turn ="x"; 
+        let totalNumberOfGoes = gameBoardModule.numberOfGameSquares;
+        let numberOfGoesCount = 1;
 
         function whoseTurn() {
-            turn= _nextTurn(turn);   
+
+            if (numberOfGoesCount < totalNumberOfGoes) {
+                console.log("Number of goes " +numberOfGoesCount);
+                numberOfGoesCount++;
+                turn= _nextTurn(turn); 
+
+            }
+            else if (numberOfGoesCount == totalNumberOfGoes) {
+               let winner = assessBoardState(); 
+                console.log("Winner: " + winner);
+               _playerWins("tie");
+               turn= _nextTurn(turn);
+ 
+            }
             return turn;  
+
 
         }
         function _nextTurn(turn) {
             
                 turn=="x" ? turn="o" : turn="x";
-                console.log("next turn " + turn);
+                console.log("turn " + turn);
                 //assessBoardState();
                 return turn
             
@@ -21,6 +111,8 @@ const gameFlow = (function() {
 
             let resultx = [];
             let resulto= [];
+            let winnerPresent = false; 
+
             for (i=0; i<gameBoardModule.list.length; i++) {
                 if (gameBoardModule.list[i].textContent =="x") {
                        resultx.push(i);
@@ -33,91 +125,35 @@ const gameFlow = (function() {
                 for (j=0; j<winningResult.length; j++) {
                     if (winningResult[j].every(elem => resultx.includes(elem))){
                         _playerWins("x");
-                        //console.log("X Wins!");
+                        winnerPresent=true;
                     }
                     else if (winningResult[j].every(elem => resulto.includes(elem))){
-                        //console.log("O Wins!");
                         _playerWins("o");
+                        winnerPresent=true;
                     }
                 }
-                
-                            
-
+                return winnerPresent;
             }
 
             function _playerWins(player) {
-                console.log(`${player} wins!`);
+                let resultMessage = document.getElementById('result');
 
-            //update message on dom
-            //clear screen or at least freeze it
-            //give option for new game
+                if (player=="x" || player=="o") {
+                    resultMessage.textContent = `${player} wins!`
+                }
+                else if (player=="tie") {
+                    resultMessage.textContent = "It's a tie!";
+                }
+                numberOfGoesCount=1;
+                gameBoardModule.clearBoard();
+            
 
             }
-               
-        
-            
-    
+
+          
         return {whoseTurn: whoseTurn, assessBoardState: assessBoardState};
     })();
     
 
-const gameBoardModule = (function() {
-    const gameBoard = document.getElementById('gameboard');
-    let squareState; 
-    let list=[];
 
-    //create rows for squares to go in
-    const numberOfRows = 3;
-    const row=[];
-    for (i=0; i<numberOfRows; i++) {
-        let rowInit = document.createElement("div");
-        rowInit.id = i;
-        rowInit.classList.add("row");
-        row.push(rowInit);
-        gameboard.appendChild(rowInit);
-     }
-
-    // create gamesquares
-    const gameBoardSquares = [];
-    const numberOfGameSquares = 9;
-    for (i=0; i<numberOfGameSquares; i++) {
-        list[i] = document.createElement("div");
-        list[i].id=i;
-        list[i].classList.add("square");
-        squareState = "";
-        list[i].textContent = squareState;
-        if (i<3) {
-            row[0].appendChild(list[i]);
-        }
-        else if (i>=3 && i<6) {
-            row[1].appendChild(list[i]);
-        }
-        else if (i>=6) {
-            row[2].appendChild(list[i]);
-        }
-
-        gameBoardSquares.push(squareState);
-    }
-
-    for (i=0; i< gameBoardSquares.length; i++) {
-        list[i].addEventListener("click", squareUpdate); 
-    }
-
-    function _render () {
-
-    }
-    
-   function squareUpdate() {
-            let squareContent = this.textContent;
-            const player = gameFlow.whoseTurn();
-            console.log("player " + player);
-            console.log(this);
-            if (squareContent=="") {
-            this.textContent=player;
-            gameFlow.assessBoardState();
-    
-            }
-        }
-        return {list};
-    })();
 

@@ -10,3 +10,9 @@
     display:flex;
     justify-content: center;
 }
+
+#result {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
